@@ -17,8 +17,7 @@ class Api::PollsController < Api::ApiController
   end
 
   def create
-    user = User.find(params[:user_id])
-    poll = user.polls.new(poll_params.merge(expired: false))
+    poll = @user.polls.new(poll_params.merge(expired: false))
     if poll.save 
       render json: {
         status: "success",
@@ -35,7 +34,7 @@ class Api::PollsController < Api::ApiController
   def show
     render json: {
       status: "success",
-      poll: Poll.find(params[:id])
+      poll: @poll
       }, status: :accepted
   end
 
@@ -54,22 +53,11 @@ class Api::PollsController < Api::ApiController
         ]
       )
   end
-
-  def verify_user_id
-    if !params[:user_id].present? || !User.find_by(id: params[:user_id]).present?
-      render json: {
-        status: "error",
-        message: "Invalid User ID"
-        }, status: :unauthorized
-    end
-  end
-
+  
   def verify_poll_id
-    if !params[:id].present? || !Poll.find_by(id: params[:id]).present?
-      render json: {
-        status: "error",
-        message: "Invalid Poll ID"
-        }, status: :unauthorized
+    @poll = Poll.find_by(id: params[:id]) if params[:id].present?
+    if @poll.nil?
+      respond_with_error("Invalid Poll ID")
     end
   end
 end
