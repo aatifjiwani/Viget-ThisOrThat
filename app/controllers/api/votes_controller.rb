@@ -7,10 +7,10 @@ class Api::VotesController < Api::ApiController
   before_action :verify_option, only: [:create, :update]
 
   def create
-    if @type == "visitor"
-      vote = @poll.visitor_votes.new(ip_address: @ip_address, option: @option)
+    vote = if @type == "visitor"
+      @poll.visitor_votes.new(ip_address: @ip_address, option: @option)
     else
-      vote = @poll.votes.new(user: @user, option: @option)
+      @poll.votes.new(user: @user, option: @option)
     end
 
     if vote.save
@@ -23,10 +23,10 @@ class Api::VotesController < Api::ApiController
   end
 
   def update
-    if @type == "visitor"
-      vote = @poll.visitor_votes.find_by(ip_address: @ip_address)
+    vote = if @type == "visitor"
+      @poll.visitor_votes.find_by(ip_address: @ip_address)    
     else
-      vote = @poll.votes.find_by(user_id: @user.id)
+      @poll.votes.find_by(user_id: @user.id)
     end
     
     if vote.update(option: @option)
@@ -39,10 +39,10 @@ class Api::VotesController < Api::ApiController
   end
 
   def destroy
-    if @type == "visitor"
-      vote = @poll.visitor_votes.find_by(ip_address: @ip_address)
+    vote = if @type == "visitor"
+      @poll.visitor_votes.find_by(ip_address: @ip_address)    
     else
-      vote = @poll.votes.find_by(user_id: @user.id)
+      @poll.votes.find_by(user_id: @user.id)
     end
     
     if vote.destroy
