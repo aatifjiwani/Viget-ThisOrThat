@@ -107,7 +107,12 @@ class Poll < ApplicationRecord
     super.merge(
       time: self.time_left,
       option_a_img: self.option_a_img.attached? ? make_image_url(self.option_a_img) : '',
-      option_b_img: self.option_b_img.attached? ? make_image_url(self.option_b_img) : ''
+      option_b_img: self.option_b_img.attached? ? make_image_url(self.option_b_img) : '',
+      username: self.user.username,
+      comment_count: self.comments.count,
+      is_user_following: !opts["user"].nil? ? opts["user"].is_following?(self.id) : false,
+      has_user_voted: !opts["user"].nil? ? opts["user"].has_voted?(self.id) : false,
+      has_visitor_voted: !opts["ip"].nil? ? self.has_visitor_voted?(opts["ip"]) : false
     )
   end
 

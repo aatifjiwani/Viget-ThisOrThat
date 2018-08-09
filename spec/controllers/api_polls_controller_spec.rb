@@ -48,7 +48,8 @@ RSpec.describe Api::PollsController, type: :controller do
       
       it 'gets all polls' do
         get :index, params: {
-          token: token
+          token: token,
+          user_id: user.id
         }
         expect(response.body).to eq({
           "status": "success",
@@ -59,6 +60,7 @@ RSpec.describe Api::PollsController, type: :controller do
       it 'shows a single poll' do
         get :show, params: {
           token: token,
+          user_id: user.id,
           id: poll_2.id
         }
         

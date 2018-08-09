@@ -1,17 +1,18 @@
 class Api::PollsController < Api::ApiController
   before_action :verify_user_id, only: :create
   before_action :verify_poll_id, only: :show
+  before_action :verify_ip_or_user_id, only: [:index, :show]
 
   def index
     if params[:filter] == "popular" 
       render json: {
         status: "success",
-        poll: Poll.popular
+        poll: Poll.popular.as_json(ip: @ip_address, user: @user)
         }, status: :accepted
     else
       render json: {
         status: "success",
-        poll: Poll.recent
+        poll: Poll.recent.as_json(ip: @ip_address, user: @user)
         }, status: :accepted
     end
   end
@@ -34,7 +35,7 @@ class Api::PollsController < Api::ApiController
   def show
     render json: {
       status: "success",
-      poll: @poll
+      poll: @poll.as_json(ip: @ip_address, user: @user)
       }, status: :accepted
   end
 
@@ -52,6 +53,16 @@ class Api::PollsController < Api::ApiController
         :mins
         ]
       )
+  end
+  
+  def verify_ip_or_user_id
+    if params[:ip_address].present?
+      @ip_address = params[:ip_address]
+    elsif params[:user_id].present?
+      @user = params[:user_id]
+    else
+      respond_with_error("Invalid parameters")
+    end
   end
   
   def verify_poll_id
