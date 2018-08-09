@@ -11,10 +11,11 @@ RSpec.describe Api::VotesController, type: :controller do
     let!(:poll) {create(:poll)}
     
     it 'responds with error with invalid vote type' do
-      get :show, params: {
+      post :create, params: {
         token: token,
         poll_id: poll.id,
         user_id: user.id,
+        option: "0",
         type: "invalid"
         }
       
@@ -42,37 +43,6 @@ RSpec.describe Api::VotesController, type: :controller do
     end
   
     describe "voting as a user" do
-      it 'shows if user has voted on poll' do
-        get :show, params: {
-          token: token,
-          poll_id: poll.id,
-          user_id: user.id,
-          type: "user"
-        }
-        
-        expect(response.body).to eq({
-          status: "success",
-          has_vote: false,
-          poll: poll.id,
-        }.to_json)
-        
-        create(:vote, poll: poll, user: user, option: 1)
-        
-        get :show, params: {
-          token: token,
-          poll_id: poll.id,
-          user_id: user.id,
-          type: "user"
-        }
-        
-        expect(response.body).to eq({
-          status: "success",
-          has_vote: true,
-          poll: poll.id,
-          option: 1
-        }.to_json)
-      end
-      
       it 'creates a vote for the user' do
         post :create, params: {
           token: token,
@@ -121,37 +91,6 @@ RSpec.describe Api::VotesController, type: :controller do
     end
     
     describe "voting as a visitor" do
-      it 'shows if visitor has voted on poll' do
-        get :show, params: {
-          token: token,
-          poll_id: poll.id,
-          ip_address: ip,
-          type: "visitor"
-        }
-        
-        expect(response.body).to eq({
-          status: "success",
-          has_vote: false,
-          poll: poll.id,
-        }.to_json)
-        
-        create(:visitor_vote, poll: poll, ip_address: ip, option: 1)
-        
-        get :show, params: {
-          token: token,
-          poll_id: poll.id,
-          ip_address: ip,
-          type: "visitor"
-        }
-        
-        expect(response.body).to eq({
-          status: "success",
-          has_vote: true,
-          poll: poll.id,
-          option: 1
-        }.to_json)
-      end
-      
       it 'creates a vote for the visitor' do
         post :create, params: {
           token: token,

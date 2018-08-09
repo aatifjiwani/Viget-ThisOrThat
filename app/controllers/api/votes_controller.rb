@@ -4,7 +4,7 @@ class Api::VotesController < Api::ApiController
   before_action :verify_poll_id
   before_action :verify_vote_type
   before_action :verify_ip_or_user
-  before_action :verify_option, only: [:create, :update, :destroy]
+  before_action :verify_option, only: [:create, :update]
 
   def create
     if @type == "visitor"
@@ -14,23 +14,11 @@ class Api::VotesController < Api::ApiController
     end
 
     if vote.save
-      render json: vote_success_json(@poll, @option), status: :ok
+      render json: vote_success_json(@poll).merge(
+        option: @option
+        ), status: :ok
     else
       respond_with_error("Vote unable to be created")
-    end
-  end
-
-  def show
-    if @type == "visitor"
-      vote = @poll.get_visitor_vote(@ip_address)
-    else
-      vote = @user.get_vote(@poll.id)
-    end
-
-    if vote.present?
-      respond_with_vote_given(vote.option)
-    else
-      respond_no_vote_given
     end
   end
 
@@ -42,7 +30,9 @@ class Api::VotesController < Api::ApiController
     end
     
     if vote.update(option: @option)
-      render json: vote_success_json(@poll, @option), status: :ok
+      render json: vote_success_json(@poll).merge(
+        option: @option
+        ), status: :ok
     else
       respond_with_error("Vote unable to be updated")
     end
@@ -56,7 +46,7 @@ class Api::VotesController < Api::ApiController
     end
     
     if vote.destroy
-      render json: vote_success_json(@poll, @option).merge(
+      render json: vote_success_json(@poll).merge(
         "delete": true,
         "optionA": 0.5,
         "optionB": 0.5
@@ -67,6 +57,14 @@ class Api::VotesController < Api::ApiController
   end
 
   private
+  def vote_type
+    @type ||= params[:type]
+  end
+  
+  def vote_option
+    @option ||= params[:option]
+  end
+  
   def verify_ip_address
     @ip_address = params[:ip_address]
     if !@ip_address.present?
@@ -75,14 +73,13 @@ class Api::VotesController < Api::ApiController
   end
 
   def verify_vote_type
-    @type = params[:type]
-    if !@type.present? || (@type != "visitor" && @type != "user")
+    if !vote_type.present? || (vote_type != "visitor" && vote_type != "user")
       respond_with_error("Invalid voting type")
     end
   end
 
   def verify_ip_or_user
-    if @type == "visitor"
+    if vote_type == "visitor"
       verify_ip_address
     else
       verify_user_id
@@ -90,10 +87,9 @@ class Api::VotesController < Api::ApiController
   end
 
   def verify_option
-    @option = params[:option]
-    if !@option.present?
+    if !vote_option.present?
       respond_with_error("No option given")
-    elsif @option != "1" && @option != "0"
+    elsif vote_option != "1" && vote_option != "0"
       respond_with_error("Invalid Option")
     else
       @option = @option.to_i
@@ -117,14 +113,13 @@ class Api::VotesController < Api::ApiController
     }, status: :ok
   end
 
-  def vote_success_json(poll, option)
+  def vote_success_json(poll)
     {
       "status": "success",
       "delete": false,
       "poll": poll.id,
       "optionA": poll.fraction_of_votes(0),
       "optionB": poll.fraction_of_votes(1),
-      "option": option,
       "count": pluralize(poll.vote_count, "vote")
     }
   end
