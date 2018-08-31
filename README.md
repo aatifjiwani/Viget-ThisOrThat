@@ -1,8 +1,21 @@
 <h1 align="center"><a href="http://this-or-that.co">ThisOrThat</a></h1>
 <p align="center">A Rails application that allows a community of users to vote between two choices.</p>
 
+<div style="margin: auto;">
+    <div style="float: left; width: 40%;>
+	    <img src="https://storage.googleapis.com/githubpictures/Screen%20Shot%202018-08-31%20at%2012.00.23%20PM.png" width='100%' height='auto'>
+    </div>
+    <div  style="float: left; width: 0%;>
+	    <img src="https://storage.googleapis.com/githubpictures/Screen%20Shot%202018-08-31%20at%204.40.56%20PM.png" width='100%' height='auto'>
+    </div>
+</div>
+
 <p align="center" style='font-size: 10px;'>
-<img src='https://storage.googleapis.com/githubpictures/Screen%20Shot%202018-08-31%20at%2012.00.23%20PM.png' width='75%' height='auto'/>
+  <img src='https://storage.googleapis.com/githubpictures/Screen%20Shot%202018-08-31%20at%2012.00.23%20PM.png' width='75%' height='auto'/>
+</p>
+
+<p align="center" style='font-size: 10px;'>
+  <img src='https://storage.googleapis.com/githubpictures/Screen%20Shot%202018-08-31%20at%204.40.56%20PM.png' width='75%' height='auto'/>
 </p>
 
 <br>
